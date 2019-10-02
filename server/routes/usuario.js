@@ -1,15 +1,26 @@
-const express = require('express');
+const express = require('express'); //Uso de express, encargado del enrutamiento y peticiones de forma rapida
 
-const bcrypt = require('bcrypt');
-const _ = require('underscore');
+const bcrypt = require('bcrypt'); //Encriptacion de contraseñas
+const _ = require('underscore'); //Funcionalidades extras de JS
 
-const Usuario = require('../models/usuario')
+const Usuario = require('../models/usuario') //Modulo creado de usuario
+const {verificaToken,verifcaAdminRol} = require('../middlewares/autenticacion');  //middleware para verificar que exista un token al momento de realizar alguna operacion
 
-const app = express();
+
+const app = express(); // usar express
 
 
 //obtiene datos
-app.get('/usuario', function (req, res) {
+app.get('/usuario', verificaToken , function (req, res) {
+
+    // este es el usuario autentificado
+    // return res.json({
+    //     usuario: req.usuario,
+    //     nombre: req.usuario.nombre,
+    //     email: req.usuario.email
+    // })
+
+
     
     let desde = req.query.desde || 0;
     desde = Number(desde);
@@ -21,7 +32,6 @@ app.get('/usuario', function (req, res) {
     //el corchete interior funciona para filtrar datos, al igual que el del count, estos tienen que usar el mismo filtro para traer el mismo resultado.
     //de la misma forma, el parametro del lado realiza un sistema de filtrado al momento de mandar la respuesta, parecido al anterior,pero de forma local por el lado del servidor
     Usuario.find({ estado:true }, 'nombre email role estado google img')
-
             .skip(desde)
             .limit(limite)
             .exec( (err, usuarios) =>{
@@ -45,7 +55,7 @@ app.get('/usuario', function (req, res) {
 })
 
 //guardar datos
-app.post('/usuario', function (req, res) {
+app.post('/usuario', [verificaToken,verifcaAdminRol] , function (req, res) {
 
     let body = req.body;
 
@@ -73,7 +83,7 @@ app.post('/usuario', function (req, res) {
 });
 
 //actualizar
-app.put('/usuario/:id', function (req, res) {
+app.put('/usuario/:id', [verificaToken,verifcaAdminRol] , function (req, res) {
 
     let id = req.params.id;
     let body = _.pick( req.body,['nombre','email','img','role','estado']);
@@ -98,7 +108,7 @@ app.put('/usuario/:id', function (req, res) {
 })
 
 //delete, ahora se acostumbra a cambiar los estados en vez de borrarlo
-app.delete('/usuario/:id', function (req, res) {
+app.delete('/usuario/:id', [verificaToken,verifcaAdminRol] , function (req, res) {
 
     let id = req.params.id;
     let body = _.pick(req.body,['estado'])

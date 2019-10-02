@@ -43,6 +43,7 @@ let usuarioSchema = new Schema({
 
 
 //eliminar la contraseña dentro del json de retorno del esquema 
+//segun la documentacion, sobreescribe el metodo para devolver ciertos parametros
 usuarioSchema.methods.toJSON = function(){
     let user = this;
     let userObject = user.toObject();
