@@ -1,10 +1,11 @@
 const express = require('express')
 const bodyParser = require('body-parser') //ayuda a obtener los datos desde el get
 const mongoose = require('mongoose') //ayuda para realizar las peticiones a la base de datos
+const path = require('path')
 const app = express()
 require('./config/config') //trae las configuracion establecidas por nosotros en la carpeta config
 
-
+ 
 //MIDDLEWARES//
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -12,6 +13,9 @@ app.use(bodyParser.urlencoded({ extended: false }))
 // parse application/json
 app.use(bodyParser.json())
 
+
+//habilitar carpeta publica
+app.use(express.static( path.resolve( __dirname ,'../public' )))
 
 //configuracion de rutas
 app.use( require('./routes/index' ));
